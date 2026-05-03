@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tracker Latihan Diet — Simple & Konsisten</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green:#639922;--green-light:#EAF3DE;--green-dark:#3B6D11;
+    --amber:#BA7517;--amber-light:#FAEEDA;--amber-dark:#854F0B;
+    --teal:#1D9E75;--teal-light:#E1F5EE;--teal-dark:#0F6E56;
+    --coral:#D85A30;--coral-light:#FAECE7;--coral-dark:#993C1D;
+    --gray:#5F5E5A;--gray-light:#F1EFE8;--gray-dark:#2C2C2A;
+    --blue:#378ADD;--blue-light:#E6F1FB;--blue-dark:#0C447C;
+    --bg:#faf9f6;--card:#ffffff;--border:#e5e3dc;
+    --text:#2C2C2A;--text-muted:#888780;
+    --radius:12px;--radius-sm:8px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+  .header{background:var(--green-dark);color:#fff;padding:1.75rem 1.5rem 1.25rem;text-align:center;position:relative;overflow:hidden;}
+  .header::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,0.05);}
+  .header h1{font-family:'Space Grotesk',sans-serif;font-size:1.5rem;font-weight:700;letter-spacing:-0.5px;}
+  .header p{font-size:0.82rem;opacity:0.7;margin-top:3px;}
+  .user-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,0.15);border-radius:999px;padding:6px 14px;font-size:0.8rem;margin-top:10px;cursor:pointer;border:1px solid rgba(255,255,255,0.2);transition:background 0.2s;}
+  .user-pill:hover{background:rgba(255,255,255,0.25);}
+  .user-dot{width:8px;height:8px;border-radius:50%;background:#9FE1CB;}
+  .sync-status{font-size:0.7rem;opacity:0.8;margin-top:6px;min-height:18px;}
+  .sync-ok{color:#9FE1CB;}.sync-err{color:#F5C4B3;}
+  .nav-tabs{display:flex;overflow-x:auto;background:var(--card);border-bottom:1px solid var(--border);padding:0 1rem;scrollbar-width:none;}
+  .nav-tabs::-webkit-scrollbar{display:none;}
+  .tab-btn{flex:none;padding:0.9rem 1rem;font-size:0.78rem;font-weight:600;color:var(--text-muted);background:none;border:none;border-bottom:2px solid transparent;cursor:pointer;white-space:nowrap;transition:all 0.2s;}
+  .tab-btn.active{color:var(--green-dark);border-bottom-color:var(--green-dark);}
+  .tab-btn:hover:not(.active){color:var(--text);}
+  .container{max-width:680px;margin:0 auto;padding:1.25rem 1rem 5rem;}
+  .section{display:none;}.section.active{display:block;}
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:1.25rem;margin-bottom:1rem;}
+  .card-title{font-family:'Space Grotesk',sans-serif;font-size:0.95rem;font-weight:700;margin-bottom:1rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .badge{font-size:0.65rem;font-weight:700;padding:2px 8px;border-radius:999px;text-transform:uppercase;letter-spacing:0.5px;}
+  .badge-green{background:var(--green-light);color:var(--green-dark);}
+  .badge-amber{background:var(--amber-light);color:var(--amber-dark);}
+  .badge-teal{background:var(--teal-light);color:var(--teal-dark);}
+  .badge-blue{background:var(--blue-light);color:var(--blue-dark);}
+  .stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem;}
+  .stat-card{background:var(--gray-light);border-radius:var(--radius-sm);padding:0.9rem 0.75rem;text-align:center;}
+  .stat-value{font-size:1.4rem;font-weight:700;font-family:'Space Grotesk',sans-serif;}
+  .stat-label{font-size:0.68rem;color:var(--text-muted);margin-top:2px;}
+  .stat-card.green .stat-value{color:var(--green-dark);}
+  .stat-card.amber .stat-value{color:var(--amber-dark);}
+  .stat-card.teal .stat-value{color:var(--teal-dark);}
+  .progress-wrap{margin:0.5rem 0 1rem;}
+  .progress-label{display:flex;justify-content:space-between;font-size:0.75rem;color:var(--text-muted);margin-bottom:5px;}
+  .progress-bar{height:8px;background:var(--gray-light);border-radius:999px;overflow:hidden;}
+  .progress-fill{height:100%;border-radius:999px;transition:width 0.5s ease;}
+  .fill-green{background:var(--green);}
+  .schedule-row{display:flex;align-items:center;gap:12px;padding:0.65rem 6px;border-bottom:1px solid var(--border);cursor:pointer;transition:background 0.15s;border-radius:var(--radius-sm);}
+  .schedule-row:last-child{border-bottom:none;}
+  .schedule-row:hover{background:var(--gray-light);}
+  .check-circle{width:26px;height:26px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:0.75rem;flex-shrink:0;transition:all 0.2s;color:transparent;}
+  .check-circle.done{background:var(--green);border-color:var(--green);color:#fff;}
+  .check-circle.rest{background:var(--gray-light);border-color:var(--gray);color:var(--gray);}
+  .track-table{width:100%;border-collapse:collapse;font-size:0.72rem;}
+  .track-table th{text-align:center;padding:6px 2px;font-size:0.6rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.3px;border-bottom:1px solid var(--border);}
+  .track-table th:first-child{text-align:left;}
+  .track-table td{padding:7px 2px;text-align:center;vertical-align:middle;}
+  .track-table td:first-child{font-weight:600;font-size:0.75rem;text-align:left;}
+  .track-table tr:not(:last-child) td{border-bottom:1px solid var(--border);}
+  .check-box{width:22px;height:22px;border-radius:5px;border:1.5px solid var(--border);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:all 0.15s;font-size:0.68rem;color:transparent;background:var(--bg);}
+  .check-box.checked{background:var(--green);border-color:var(--green);color:#fff;}
+  .exercise-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+  .exercise-item:last-child{border-bottom:none;}
+  .ex-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.7rem;font-weight:700;flex-shrink:0;margin-top:1px;background:var(--amber-light);color:var(--amber-dark);}
+  .ex-name{font-weight:600;font-size:0.84rem;}
+  .ex-detail{font-size:0.73rem;color:var(--text-muted);margin-top:2px;}
+  .ex-sets{display:flex;gap:5px;margin-top:8px;}
+  .set-dot{width:28px;height:28px;border-radius:5px;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:0.65rem;color:var(--text-muted);cursor:pointer;transition:all 0.2s;font-weight:600;}
+  .set-dot.done{background:var(--amber);border-color:var(--amber);color:#fff;}
+  .input-row{display:flex;gap:8px;margin-bottom:0.75rem;}
+  input[type=text],input[type=number],textarea{padding:10px 12px;border:1px solid var(--border);border-radius:var(--radius-sm);font-family:'Plus Jakarta Sans',sans-serif;font-size:0.85rem;background:var(--bg);color:var(--text);}
+  input[type=text]:focus,input[type=number]:focus,textarea:focus{outline:2px solid var(--green);border-color:transparent;}
+  textarea{width:100%;resize:vertical;min-height:80px;}
+  .btn{padding:10px 16px;border-radius:var(--radius-sm);border:none;cursor:pointer;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:0.82rem;transition:all 0.2s;}
+  .btn-green{background:var(--green);color:#fff;}.btn-green:hover{background:var(--green-dark);}
+  .btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);}.btn-outline:hover{background:var(--gray-light);}
+  .log-item{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:0.8rem;}
+  .log-item:last-child{border-bottom:none;}
+  .diff-down{color:var(--green-dark);font-weight:600;font-size:0.72rem;}
+  .diff-up{color:var(--coral-dark);font-weight:600;font-size:0.72rem;}
+  .chart-wrap{display:flex;gap:5px;align-items:flex-end;height:80px;margin:0.75rem 0 0.4rem;}
+  .chart-col{flex:1;display:flex;flex-direction:column;align-items:center;}
+  .chart-bar{width:100%;border-radius:4px 4px 0 0;transition:height 0.4s ease;min-height:3px;}
+  .chart-lbl{font-size:0.6rem;color:var(--text-muted);font-weight:600;margin-top:3px;}
+  .week-nav-row{display:flex;align-items:center;justify-content:space-between;background:var(--gray-light);border-radius:var(--radius-sm);padding:6px 10px;margin-bottom:1rem;}
+  .week-nav-row span{font-size:0.8rem;font-weight:600;}
+  .week-nav-btn{background:none;border:none;cursor:pointer;font-size:1rem;color:var(--text);padding:2px 8px;}
+  .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:100;align-items:center;justify-content:center;padding:1rem;}
+  .modal-overlay.open{display:flex;}
+  .modal{background:var(--card);border-radius:var(--radius);padding:1.5rem;max-width:360px;width:100%;}
+  .modal h3{font-family:'Space Grotesk',sans-serif;font-size:1rem;margin-bottom:8px;}
+  .modal p{font-size:0.78rem;color:var(--text-muted);margin-bottom:12px;line-height:1.5;}
+  .modal input{width:100%;margin-bottom:10px;}
+  .modal-footer{display:flex;gap:8px;justify-content:flex-end;}
+  .fab{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--green-dark);color:#fff;border:none;border-radius:999px;padding:11px 18px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:600;font-size:0.8rem;cursor:pointer;box-shadow:0 4px 16px rgba(59,109,17,0.35);transition:all 0.2s;display:flex;align-items:center;gap:6px;z-index:50;}
+  .fab:hover{transform:translateY(-2px);}
+  .fab-dot{width:7px;height:7px;border-radius:50%;background:#9FE1CB;}
+  .tip-row{display:flex;gap:8px;align-items:flex-start;margin-bottom:5px;font-size:0.8rem;}
+  .reminder-box{background:var(--teal-light);border:1px solid #9FE1CB;border-radius:var(--radius-sm);padding:0.85rem 1rem;font-size:0.8rem;color:var(--teal-dark);margin-bottom:1rem;font-style:italic;font-weight:500;}
+  .config-box{background:var(--green-light);border-radius:var(--radius-sm);padding:10px 12px;font-size:0.75rem;color:var(--green-dark);margin-bottom:12px;line-height:1.7;}
+  .spinner{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .steps-bar{height:6px;background:var(--gray-light);border-radius:999px;overflow:hidden;margin-top:6px;}
+  .steps-fill{height:100%;border-radius:999px;background:var(--teal);transition:width 0.4s;}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🏋️ Latihan Simple & Konsisten</h1>
+  <p>Tracker Diet & Olahraga — Tersimpan di Google Sheets kamu</p>
+  <div class="user-pill" onclick="openUserModal()">
+    <div class="user-dot"></div>
+    <span id="userName">Masukkan Nama</span>
+    <span style="opacity:0.6">✎</span>
+  </div>
+  <div class="sync-status" id="syncStatus">⚙️ Belum terhubung — setup di tab Panduan</div>
+</div>
+
+<div class="nav-tabs">
+  <button class="tab-btn active" onclick="switchTab('today',this)">📅 Hari Ini</button>
+  <button class="tab-btn" onclick="switchTab('exercise',this)">💪 Latihan</button>
+  <button class="tab-btn" onclick="switchTab('weekly',this)">📊 Mingguan</button>
+  <button class="tab-btn" onclick="switchTab('progress',this)">⚖️ Progres</button>
+  <button class="tab-btn" onclick="switchTab('guide',this)">📖 Panduan</button>
+</div>
+
+<div class="container">
+
+<!-- TAB: HARI INI -->
+<div id="tab-today" class="section active">
+  <div class="reminder-box">💬 "Turun = hasil dari konsistensi kecil tiap hari"</div>
+  <div class="stat-grid">
+    <div class="stat-card green"><div class="stat-value" id="stChecked">–</div><div class="stat-label">Checklist ✓</div></div>
+    <div class="stat-card amber"><div class="stat-value" id="stPct">–</div><div class="stat-label">Konsistensi</div></div>
+    <div class="stat-card teal"><div class="stat-value" id="stStreak">–</div><div class="stat-label">Streak hari</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📅 Checklist Hari Ini <span class="badge" id="todayBadge">–</span></div>
+    <div id="todayHint" style="font-size:0.8rem;color:var(--text-muted);margin-bottom:0.75rem;"></div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>Progress</span><span id="todayPctLbl">0%</span></div>
+      <div class="progress-bar"><div class="progress-fill fill-green" id="todayBar" style="width:0%"></div></div>
+    </div>
+    <div id="todayChecks"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📝 Catatan Hari Ini</div>
+    <textarea id="todayNote" placeholder="Tulis catatan singkat hari ini..."></textarea>
+    <div style="margin-top:8px;display:flex;justify-content:flex-end;">
+      <button class="btn btn-green" onclick="syncToday()">💾 Simpan & Sync ke Sheets</button>
+    </div>
+  </div>
+  <div class="card" style="background:var(--coral-light);border-color:#F5C4B3;">
+    <div class="card-title" style="color:var(--coral-dark);">🚨 Mode Lagi Drop?</div>
+    <div class="tip-row"><span>👉</span><span style="color:var(--coral-dark);">Jalan 10–20 menit ATAU stretching ringan</span></div>
+    <div class="tip-row"><span>✔</span><span style="color:var(--coral-dark);font-weight:600;">Tetap gerak = tetap konsisten</span></div>
+  </div>
+</div>
+
+<!-- TAB: LATIHAN -->
+<div id="tab-exercise" class="section">
+  <div class="card">
+    <div class="card-title">🗓️ Jadwal Mingguan</div>
+    <div id="scheduleList"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">💪 Strength A <span class="badge badge-amber">3–4 set · ±30 menit</span></div>
+    <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.75rem;">Istirahat 30–60 detik antar set. Tap angka untuk tandai set selesai.</p>
+    <div id="exercisesA"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">💪 Strength B <span class="badge badge-amber">3 set · ±30 menit</span></div>
+    <div id="exercisesB"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🚶 Cardio <span class="badge badge-teal">30–45 menit</span></div>
+    <div class="tip-row"><span>🎯</span><span style="font-size:0.8rem;">Target: <strong>6.000–8.000 langkah/hari</strong></span></div>
+    <div class="tip-row"><span>⚡</span><span style="font-size:0.8rem;">Kecepatan nyaman tapi agak napas naik</span></div>
+    <div style="margin-top:0.75rem;border-top:1px solid var(--border);padding-top:0.75rem;">
+      <div style="font-size:0.75rem;font-weight:600;color:var(--text-muted);margin-bottom:6px;">Catat langkah hari ini</div>
+      <div class="input-row">
+        <input type="number" id="stepsInput" placeholder="contoh: 7500" style="flex:1;">
+        <button class="btn btn-green" onclick="saveSteps()">Simpan</button>
+      </div>
+      <div id="stepsDisplay" style="font-size:0.75rem;color:var(--text-muted);"></div>
+      <div class="steps-bar"><div class="steps-fill" id="stepsBar" style="width:0%"></div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🧘 Stretching <span class="badge badge-teal">Wajib 5–10 menit</span></div>
+    <div class="tip-row"><span>✔</span><span style="font-size:0.8rem;">Paha depan & belakang</span></div>
+    <div class="tip-row"><span>✔</span><span style="font-size:0.8rem;">Betis (penting buat tumit!)</span></div>
+    <div class="tip-row"><span>✔</span><span style="font-size:0.8rem;">Pinggang</span></div>
+  </div>
+  <div class="card" style="background:var(--amber-light);border-color:#FAC775;">
+    <div class="card-title" style="color:var(--amber-dark);">⚠️ Penyesuaian Khusus</div>
+    <div class="tip-row"><span>❌</span><span style="font-size:0.8rem;color:var(--amber-dark);">Jangan lompat-lompat (no jumping)</span></div>
+    <div class="tip-row"><span>❌</span><span style="font-size:0.8rem;color:var(--amber-dark);">Hindari lari dulu</span></div>
+    <div class="tip-row"><span>✔</span><span style="font-size:0.8rem;color:var(--amber-dark);">Gerakan pelan & stabil</span></div>
+  </div>
+</div>
+
+<!-- TAB: MINGGUAN -->
+<div id="tab-weekly" class="section">
+  <div class="week-nav-row">
+    <button class="week-nav-btn" onclick="changeWeek(-1)">◀</button>
+    <span id="weekLabel">Minggu Ini</span>
+    <button class="week-nav-btn" onclick="changeWeek(1)">▶</button>
+  </div>
+  <div class="card">
+    <div class="card-title">🔥 Skor Konsistensi</div>
+    <div class="stat-grid">
+      <div class="stat-card green"><div class="stat-value" id="wkWorkout">–</div><div class="stat-label">Olahraga</div></div>
+      <div class="stat-card amber"><div class="stat-value" id="wkMeal">–</div><div class="stat-label">Makan OK</div></div>
+      <div class="stat-card teal"><div class="stat-value" id="wkScore">–</div><div class="stat-label">Total Score</div></div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>Progress minggu ini</span><span id="wkScoreLbl">0%</span><span style="color:var(--green-dark);font-weight:600;">Target ≥80%</span></div>
+      <div class="progress-bar"><div class="progress-fill fill-green" id="wkBar" style="width:0%"></div></div>
+    </div>
+    <button class="btn btn-green" onclick="syncWeekly()" style="width:100%;">💾 Kirim Rekap Minggu Ini ke Sheets</button>
+  </div>
+  <div class="card">
+    <div class="card-title">📊 Chart 7 Hari</div>
+    <div class="chart-wrap" id="weekChart"></div>
+    <div style="display:flex;gap:5px;" id="weekChartLbls"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📋 Tracking Harian Lengkap</div>
+    <div style="overflow-x:auto;">
+      <table class="track-table">
+        <thead><tr>
+          <th>Hari</th><th>Pagi</th><th>Siang</th><th>Malam</th>
+          <th>Protein</th><th>Karbo</th><th>Ngemil</th><th>No Manis</th><th>Air</th><th>Olahraga</th>
+        </tr></thead>
+        <tbody id="trackBody"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🏆 Kemenangan Minggu Ini</div>
+    <textarea id="weekWins" placeholder="Tulis pencapaian minggu ini..."></textarea>
+    <div class="card-title" style="color:var(--coral-dark);margin-top:0.75rem;">⚠️ Yang Perlu Diperbaiki</div>
+    <textarea id="weekImprov" placeholder="Tulis hal yang perlu diperbaiki..."></textarea>
+  </div>
+</div>
+
+<!-- TAB: PROGRES -->
+<div id="tab-progress" class="section">
+  <div class="card">
+    <div class="card-title">⚖️ Catat Berat Badan</div>
+    <div class="input-row">
+      <input type="number" id="weightInput" placeholder="Berat (kg)" step="0.1" style="flex:1;">
+      <button class="btn btn-green" onclick="saveWeightEntry()">Catat</button>
+    </div>
+    <div id="weightLog"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📏 Lingkar Perut</div>
+    <div class="input-row">
+      <input type="number" id="waistInput" placeholder="Lingkar perut (cm)" step="0.5" style="flex:1;">
+      <button class="btn btn-green" onclick="saveWaistEntry()">Catat</button>
+    </div>
+    <div id="waistLog"></div>
+  </div>
+  <div class="card">
+    <div class="card-title">🔥 Level Repetisi</div>
+    <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.75rem;">Setiap 2 minggu konsisten → naik level!</p>
+    <div id="repLevels"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:0.75rem;" id="repBtns"></div>
+  </div>
+</div>
+
+<!-- TAB: PANDUAN -->
+<div id="tab-guide" class="section">
+  <div class="card">
+    <div class="card-title">⚙️ Setup Google Sheets</div>
+    <div class="config-box">
+      <strong>Cara setup (5 langkah):</strong><br>
+      1. Buka Google Sheet kamu → <strong>Extensions → Apps Script</strong><br>
+      2. Paste isi file <strong>Code.gs</strong> yang sudah didownload<br>
+      3. Klik <strong>Deploy → New Deployment → Web App</strong><br>
+      4. Execute as: <em>Me</em> · Who has access: <em>Anyone</em><br>
+      5. Copy URL-nya → paste di bawah ini
+    </div>
+    <div class="input-row">
+      <input type="text" id="scriptUrlInput" placeholder="https://script.google.com/macros/s/AKfycbyoV66pDltQaI_il90dDJZ2IIjS-QyQRWP5TZ-IKyNccmIFPWhpUqIkIMjawWdv7Lr1gg/exec" style="flex:1;font-size:0.74rem;">
+      <button class="btn btn-green" onclick="saveScriptUrl()">Simpan</button>
+    </div>
+    <div id="urlStatus" style="font-size:0.75rem;color:var(--text-muted);margin-top:4px;"></div>
+    <button class="btn btn-outline" onclick="testConnection()" style="width:100%;margin-top:10px;">🔌 Test Koneksi ke Sheets</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🎯 Target Program</div>
+    <div class="tip-row"><span>📅</span><span style="font-size:0.82rem;"><strong>5 hari aktif / minggu</strong></span></div>
+    <div class="tip-row"><span>⏱️</span><span style="font-size:0.82rem;">Durasi: <strong>30–45 menit</strong></span></div>
+    <div class="tip-row"><span>🔥</span><span style="font-size:0.82rem;">Fokus: <strong>bakar lemak + jaga otot</strong></span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📏 Panduan Porsi Makan</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div style="background:var(--green-light);border-radius:var(--radius-sm);padding:0.75rem;">
+        <div style="font-size:0.65rem;font-weight:700;color:var(--green-dark);text-transform:uppercase;margin-bottom:4px;">Protein</div>
+        <div style="font-size:0.8rem;color:var(--green-dark);">1 telapak tangan / 2 telur</div>
+      </div>
+      <div style="background:var(--amber-light);border-radius:var(--radius-sm);padding:0.75rem;">
+        <div style="font-size:0.65rem;font-weight:700;color:var(--amber-dark);text-transform:uppercase;margin-bottom:4px;">Karbo</div>
+        <div style="font-size:0.8rem;color:var(--amber-dark);">Siang: 1 genggam · Malam: ½ / skip</div>
+      </div>
+      <div style="background:var(--teal-light);border-radius:var(--radius-sm);padding:0.75rem;">
+        <div style="font-size:0.65rem;font-weight:700;color:var(--teal-dark);text-transform:uppercase;margin-bottom:4px;">Sayur</div>
+        <div style="font-size:0.8rem;color:var(--teal-dark);">2 genggam</div>
+      </div>
+      <div style="background:var(--gray-light);border-radius:var(--radius-sm);padding:0.75rem;">
+        <div style="font-size:0.65rem;font-weight:700;color:var(--gray);text-transform:uppercase;margin-bottom:4px;">Lemak/Saus</div>
+        <div style="font-size:0.8rem;color:var(--gray);">Maks 1 ibu jari</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="background:var(--coral-light);border-color:#F5C4B3;">
+    <div class="card-title" style="color:var(--coral-dark);">🚨 Emergency: Kalap?</div>
+    <div class="tip-row"><span>→</span><span style="color:var(--coral-dark);font-weight:600;">STOP</span></div>
+    <div class="tip-row"><span>→</span><span style="color:var(--coral-dark);">Next: protein + sayur</span></div>
+    <div class="tip-row"><span>→</span><span style="color:var(--coral-dark);">Jalan 20 menit</span></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" style="color:var(--coral-dark);">🗑️ Reset Cache Lokal</div>
+    <p style="font-size:0.78rem;color:var(--text-muted);margin-bottom:0.75rem;">Hapus data lokal di browser ini. Data di Google Sheets tetap aman.</p>
+    <button class="btn btn-outline" onclick="resetLocal()" style="border-color:var(--coral-dark);color:var(--coral-dark);">Reset Cache Lokal</button>
+  </div>
+</div>
+
+</div>
+
+<!-- USER MODAL -->
+<div class="modal-overlay" id="userModal">
+  <div class="modal">
+    <h3>👤 Siapa namamu?</h3>
+    <p>Nama ini akan dipakai sebagai identitas di Google Sheets. Pastikan konsisten setiap kali buka aplikasi ini.</p>
+    <input type="text" id="userInput" placeholder="Contoh: Diane" maxlength="30">
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeUserModal()">Batal</button>
+      <button class="btn btn-green" onclick="setUser()">Mulai ✓</button>
+    </div>
+  </div>
+</div>
+
+<button class="fab" onclick="quickSync()">
+  <div class="fab-dot"></div>
+  <span id="fabLabel">Sync ke Sheets</span>
+</button>
+
+<script>
+const DAYS_ID=['Senin','Selasa','Rabu','Kamis','Jumat','Sabtu','Minggu'];
+const DAYS_S=['Sen','Sel','Rab','Kam','Jum','Sab','Min'];
+const SCHEDULE=[
+  {day:'Senin',type:'Strength A',badge:'strength',icon:'💪'},
+  {day:'Selasa',type:'Jalan (Cardio)',badge:'cardio',icon:'🚶'},
+  {day:'Rabu',type:'Strength B',badge:'strength',icon:'💪'},
+  {day:'Kamis',type:'Jalan (Cardio)',badge:'cardio',icon:'🚶'},
+  {day:'Jumat',type:'Strength A',badge:'strength',icon:'💪'},
+  {day:'Sabtu',type:'Jalan santai / Opsional',badge:'optional',icon:'🌤️'},
+  {day:'Minggu',type:'Rest / Stretching',badge:'rest',icon:'🧘'},
+];
+const CHECKS=[
+  {id:'pagi',label:'Makan pagi OK'},
+  {id:'siang',label:'Makan siang OK'},
+  {id:'malam',label:'Makan malam OK'},
+  {id:'protein',label:'Protein cukup'},
+  {id:'karbo',label:'Karbo sesuai'},
+  {id:'ngemil',label:'Ngemil ≤ 1x'},
+  {id:'no_manis',label:'No minuman manis'},
+  {id:'air',label:'Air minum 2L'},
+  {id:'olahraga',label:'Olahraga ✓'},
+];
+const COLS=['pagi','siang','malam','protein','karbo','ngemil','no_manis','air','olahraga'];
+const EX_A=[
+  {name:'Squat',detail:'Pakai kursi kalau perlu — 12 reps',sets:3},
+  {name:'Dumbbell Row (2kg)',detail:'12 reps per sisi',sets:3},
+  {name:'Wall Push Up / Push Up',detail:'10 reps',sets:3},
+  {name:'Glute Bridge',detail:'15 reps',sets:3},
+  {name:'Plank',detail:'20–30 detik',sets:3},
+];
+const EX_B=[
+  {name:'Lunges Pelan',detail:'Opsional jika lutut aman — 10 reps/kaki',sets:3},
+  {name:'Shoulder Press (Dumbbell)',detail:'12 reps',sets:3},
+  {name:'Deadlift Ringan (Dumbbell)',detail:'12 reps',sets:3},
+  {name:'Bird Dog',detail:'10 reps kiri-kanan',sets:3},
+  {name:'Sit Up / Crunch',detail:'10–15 reps',sets:3},
+];
+
+let user='', weekOff=0;
+
+function lk(k){return 'trk_'+user+'_'+k;}
+function ls(k,v){try{localStorage.setItem(lk(k),JSON.stringify(v));}catch(e){}}
+function ll(k,d){try{const v=localStorage.getItem(lk(k));return v!==null?JSON.parse(v):d;}catch(e){return d;}}
+function todayKey(){const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function todayDayIdx(){return (new Date().getDay()+6)%7;}
+function weekStart(off=0){const d=new Date(),day=d.getDay()||7;d.setDate(d.getDate()-day+1+off*7);d.setHours(0,0,0,0);return d;}
+function weekDates(off=0){const s=weekStart(off);return Array.from({length:7},(_,i)=>{const d=new Date(s);d.setDate(s.getDate()+i);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;});}
+function dfmt(d){return `${d.getDate()}/${d.getMonth()+1}`;}
+function getUrl(){return localStorage.getItem('gs_url')||'';}
+
+// API
+async function api(params){
+  const url=getUrl();
+  if(!url) throw new Error('Script URL belum diset. Buka tab Panduan → Setup Google Sheets.');
+  const qs=new URLSearchParams(params).toString();
+  const r=await fetch(`${url}?${qs}`);
+  const j=await r.json();
+  if(!j.ok) throw new Error(j.error||'API error');
+  return j.data;
+}
+
+function setSyncStatus(msg,ok){
+  const el=document.getElementById('syncStatus');
+  el.textContent=msg;
+  el.className='sync-status '+(ok?'sync-ok':'sync-err');
+}
+function setFab(txt){document.getElementById('fabLabel').textContent=txt;}
+
+function saveScriptUrl(){
+  const url=document.getElementById('scriptUrlInput').value.trim();
+  if(!url){alert('URL tidak boleh kosong!');return;}
+  localStorage.setItem('gs_url',url);
+  document.getElementById('urlStatus').textContent='✓ URL tersimpan. Coba test koneksi.';
+  setSyncStatus('⚙️ URL tersimpan — coba test koneksi',false);
+}
+
+async function testConnection(){
+  setSyncStatus('🔄 Testing koneksi...',false);
+  document.getElementById('urlStatus').textContent='🔄 Menghubungi Google Sheets...';
+  try{
+    await api({action:'getAllUsers'});
+    setSyncStatus('✅ Terhubung ke Google Sheets!',true);
+    document.getElementById('urlStatus').textContent='✅ Koneksi berhasil! Siap digunakan.';
+  }catch(e){
+    setSyncStatus('❌ Gagal: '+e.message,false);
+    document.getElementById('urlStatus').textContent='❌ Gagal: '+e.message;
+  }
+}
+
+// SYNC
+async function syncToday(){
+  if(!user){openUserModal();return;}
+  setFab('🔄 Menyimpan...');
+  const dk=todayKey(), d=ll('day_'+dk,{});
+  try{
+    await api({
+      action:'saveDaily', nama:user, tanggal:dk,
+      'checks[pagi]':d.pagi?1:0,'checks[siang]':d.siang?1:0,'checks[malam]':d.malam?1:0,
+      'checks[protein]':d.protein?1:0,'checks[karbo]':d.karbo?1:0,'checks[ngemil]':d.ngemil?1:0,
+      'checks[no_manis]':d.no_manis?1:0,'checks[air]':d.air?1:0,'checks[olahraga]':d.olahraga?1:0,
+      langkah:ll('steps_'+dk,''), catatan:document.getElementById('todayNote').value
+    });
+    setSyncStatus('✅ Tersimpan ke Sheets — '+new Date().toLocaleTimeString('id'),true);
+    setFab('✓ Tersimpan!');
+  }catch(e){
+    setSyncStatus('❌ Gagal sync: '+e.message,false);
+    setFab('❌ Gagal');
+  }
+  setTimeout(()=>setFab('Sync ke Sheets'),2500);
+}
+
+async function syncWeekly(){
+  if(!user){openUserModal();return;}
+  setFab('🔄 Menyimpan...');
+  const dates=weekDates(weekOff);
+  const ws=weekStart(weekOff),we=new Date(ws);we.setDate(ws.getDate()+6);
+  const wStr=`${dfmt(ws)}–${dfmt(we)}`;
+  let total=0,possible=0,wo=0;
+  dates.forEach(dk=>{const d=ll('day_'+dk,{});total+=COLS.filter(c=>!!d[c]).length;possible+=COLS.length;if(d.olahraga)wo++;});
+  const skor=Math.round(total/possible*100);
+  try{
+    await api({action:'saveWeekly',nama:user,minggu:wStr,skor,olahraga_hari:wo,
+      kemenangan:document.getElementById('weekWins').value,
+      diperbaiki:document.getElementById('weekImprov').value});
+    setSyncStatus('✅ Rekap mingguan tersimpan ke Sheets!',true);
+    setFab('✓ Rekap tersimpan!');
+  }catch(e){
+    setSyncStatus('❌ Gagal: '+e.message,false);
+    setFab('❌ Gagal');
+  }
+  setTimeout(()=>setFab('Sync ke Sheets'),2500);
+}
+
+async function saveWeightEntry(){
+  if(!user){openUserModal();return;}
+  const val=parseFloat(document.getElementById('weightInput').value);
+  if(!val)return;
+  const dk=todayKey(),log=ll('weight_log',[]);
+  const idx=log.findIndex(e=>e.date===dk);
+  const entry={date:dk,berat:val};
+  if(idx>=0)log[idx]=entry;else log.push(entry);
+  log.sort((a,b)=>a.date.localeCompare(b.date));
+  ls('weight_log',log);
+  document.getElementById('weightInput').value='';
+  renderWeightLog();
+  try{await api({action:'saveWeight',nama:user,tanggal:dk,berat:val});setSyncStatus('✅ Berat tersimpan ke Sheets!',true);}
+  catch(e){setSyncStatus('⚠️ Tersimpan lokal, gagal sync: '+e.message,false);}
+}
+
+async function saveWaistEntry(){
+  if(!user){openUserModal();return;}
+  const val=parseFloat(document.getElementById('waistInput').value);
+  if(!val)return;
+  const dk=todayKey(),log=ll('waist_log',[]);
+  const idx=log.findIndex(e=>e.date===dk);
+  const entry={date:dk,lingkar:val};
+  if(idx>=0)log[idx]=entry;else log.push(entry);
+  log.sort((a,b)=>a.date.localeCompare(b.date));
+  ls('waist_log',log);
+  document.getElementById('waistInput').value='';
+  renderWaistLog();
+  try{await api({action:'saveWeight',nama:user,tanggal:dk,lingkar:val});setSyncStatus('✅ Lingkar tersimpan ke Sheets!',true);}
+  catch(e){setSyncStatus('⚠️ Tersimpan lokal, gagal sync: '+e.message,false);}
+}
+
+async function quickSync(){if(!user){openUserModal();return;}await syncToday();}
+
+// USER
+function openUserModal(){document.getElementById('userInput').value=user;document.getElementById('userModal').classList.add('open');setTimeout(()=>document.getElementById('userInput').focus(),100);}
+function closeUserModal(){document.getElementById('userModal').classList.remove('open');}
+function setUser(){
+  const name=document.getElementById('userInput').value.trim();
+  if(!name)return;
+  user=name;localStorage.setItem('trk_lastUser',name);
+  document.getElementById('userName').textContent=name;
+  closeUserModal();renderAll();
+}
+
+// TABS
+function switchTab(t,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
+  btn.classList.add('active');
+  if(t==='weekly')renderWeekly();
+  if(t==='progress'){renderWeightLog();renderWaistLog();renderRepLevels();}
+  if(t==='guide'){
+    const url=getUrl();
+    document.getElementById('scriptUrlInput').value=url;
+    document.getElementById('urlStatus').textContent=url?'URL sudah tersimpan':'Belum ada URL – paste URL di atas';
+  }
+}
+
+// RENDER TODAY
+function renderToday(){
+  const di=todayDayIdx(),dk=todayKey(),sched=SCHEDULE[di];
+  const lb=document.getElementById('todayBadge');
+  lb.textContent=sched.icon+' '+sched.type;
+  lb.className='badge '+(sched.badge==='strength'?'badge-amber':sched.badge==='cardio'?'badge-teal':'badge-blue');
+  const hint=document.getElementById('todayHint');
+  if(sched.badge==='strength')hint.innerHTML='<span style="color:var(--amber-dark)">💪 Hari strength — lihat tab Latihan untuk detailnya</span>';
+  else if(sched.badge==='cardio')hint.innerHTML='<span style="color:var(--teal-dark)">🚶 Hari cardio — target 6.000–8.000 langkah hari ini!</span>';
+  else hint.innerHTML='<span style="color:var(--blue-dark)">🧘 Hari rest — stretching 5–10 menit ya</span>';
+  const data=ll('day_'+dk,{});
+  const ctr=document.getElementById('todayChecks');ctr.innerHTML='';
+  CHECKS.forEach(ch=>{
+    const checked=!!data[ch.id];
+    const row=document.createElement('div');row.className='schedule-row';
+    row.onclick=()=>toggleCheck(ch.id,dk);
+    row.innerHTML=`<div style="flex:1;font-size:0.82rem;">${ch.label}</div><div class="check-circle ${checked?'done':''}">${checked?'✓':''}</div>`;
+    ctr.appendChild(row);
+  });
+  const done=CHECKS.filter(ch=>!!data[ch.id]).length;
+  const pct=Math.round(done/CHECKS.length*100);
+  document.getElementById('todayBar').style.width=pct+'%';
+  document.getElementById('todayPctLbl').textContent=pct+'%';
+  document.getElementById('stChecked').textContent=done+'/'+CHECKS.length;
+  document.getElementById('stPct').textContent=pct+'%';
+  document.getElementById('stStreak').textContent=calcStreak();
+  document.getElementById('todayNote').value=ll('note_'+dk,'');
+}
+
+function toggleCheck(id,dk){
+  if(!user){openUserModal();return;}
+  const d=ll('day_'+dk,{});d[id]=!d[id];ls('day_'+dk,d);
+  renderToday();
+}
+
+function calcStreak(){
+  let s=0;const d=new Date();
+  for(let i=0;i<60;i++){
+    const k=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    if(CHECKS.filter(ch=>!!ll('day_'+k,{})[ch.id]).length>=5)s++;
+    else if(i>0)break;
+    d.setDate(d.getDate()-1);
+  }
+  return s;
+}
+
+// SCHEDULE
+function renderSchedule(){
+  const di=todayDayIdx(),dates=weekDates(0),el=document.getElementById('scheduleList');el.innerHTML='';
+  SCHEDULE.forEach((s,i)=>{
+    const dk=dates[i],d=ll('day_'+dk,{}),worked=!!d.olahraga,isToday=i===di,isRest=s.badge==='rest';
+    const row=document.createElement('div');row.className='schedule-row';
+    row.onclick=()=>{if(!user){openUserModal();return;}if(!isRest){const d=ll('day_'+dk,{});d.olahraga=!d.olahraga;ls('day_'+dk,d);renderSchedule();if(i===di)renderToday();}};
+    row.innerHTML=`
+      <div style="min-width:60px;font-weight:600;font-size:0.78rem;${isToday?'color:var(--green-dark)':''}">${s.day}${isToday?' 📍':''}</div>
+      <div style="flex:1;font-size:0.82rem;">${s.icon} ${s.type}</div>
+      <div class="check-circle ${isRest?'rest':worked?'done':''}">${isRest?'—':worked?'✓':''}</div>`;
+    el.appendChild(row);
+  });
+}
+
+// EXERCISES
+function renderExList(elId,exList,prefix){
+  const el=document.getElementById(elId);el.innerHTML='';
+  exList.forEach((ex,i)=>{
+    const sets=ll('ex_'+prefix+'_'+i,[false,false,false]);
+    const wrap=document.createElement('div');wrap.className='exercise-item';
+    wrap.innerHTML=`<div class="ex-num">${i+1}</div><div style="flex:1"><div class="ex-name">${ex.name}</div><div class="ex-detail">${ex.detail}</div><div class="ex-sets">${sets.map((done,si)=>`<div class="set-dot ${done?'done':''}" onclick="toggleSet('${prefix}',${i},${si})">${si+1}</div>`).join('')}</div></div>`;
+    el.appendChild(wrap);
+  });
+}
+function toggleSet(prefix,ei,si){
+  if(!user){openUserModal();return;}
+  const k='ex_'+prefix+'_'+ei,d=ll(k,[false,false,false]);
+  d[si]=!d[si];ls(k,d);
+  renderExList(prefix==='a'?'exercisesA':'exercisesB',prefix==='a'?EX_A:EX_B,prefix);
+}
+
+function saveSteps(){
+  if(!user){openUserModal();return;}
+  const val=document.getElementById('stepsInput').value;if(!val)return;
+  ls('steps_'+todayKey(),parseInt(val));renderStepsDisplay();
+}
+function renderStepsDisplay(){
+  const s=ll('steps_'+todayKey(),null),el=document.getElementById('stepsDisplay');
+  if(s===null){el.textContent='';document.getElementById('stepsBar').style.width='0%';return;}
+  document.getElementById('stepsInput').value=s;
+  const pct=Math.min(100,Math.round(s/8000*100));
+  el.innerHTML=`<strong style="color:var(--teal-dark)">${s.toLocaleString()} langkah</strong> — ${pct}% dari target 8.000`;
+  document.getElementById('stepsBar').style.width=pct+'%';
+}
+
+// WEEKLY
+function renderWeekly(){
+  const dates=weekDates(weekOff);
+  const ws=weekStart(weekOff),we=new Date(ws);we.setDate(ws.getDate()+6);
+  document.getElementById('weekLabel').textContent=`${dfmt(ws)} – ${dfmt(we)}`;
+  const tbody=document.getElementById('trackBody');tbody.innerHTML='';
+  let total=0,possible=0,workout=0,meal=0,chart=[];
+  dates.forEach((dk,i)=>{
+    const d=ll('day_'+dk,{}),cnt=COLS.filter(c=>!!d[c]).length;
+    total+=cnt;possible+=COLS.length;if(d.olahraga)workout++;if(d.pagi||d.siang||d.malam)meal++;chart.push(cnt);
+    const isToday=(weekOff===0&&i===todayDayIdx());
+    const tr=document.createElement('tr');
+    tr.innerHTML=`<td style="${isToday?'color:var(--green-dark);font-weight:700':''}">${DAYS_S[i]}</td>`+
+      COLS.map(c=>`<td><div class="check-box ${d[c]?'checked':''}" onclick="toggleTrack('${dk}','${c}',this)">${d[c]?'✓':''}</div></td>`).join('');
+    tbody.appendChild(tr);
+  });
+  const sc=Math.round(total/possible*100);
+  document.getElementById('wkWorkout').textContent=workout+'/5';
+  document.getElementById('wkMeal').textContent=meal+'/7';
+  document.getElementById('wkScore').textContent=sc+'%';
+  document.getElementById('wkScoreLbl').textContent=sc+'%';
+  document.getElementById('wkBar').style.width=sc+'%';
+  renderChart(chart);
+  document.getElementById('weekWins').value=ll('wk_wins_'+weekOff,'');
+  document.getElementById('weekImprov').value=ll('wk_improv_'+weekOff,'');
+  document.getElementById('weekWins').oninput=()=>ls('wk_wins_'+weekOff,document.getElementById('weekWins').value);
+  document.getElementById('weekImprov').oninput=()=>ls('wk_improv_'+weekOff,document.getElementById('weekImprov').value);
+}
+
+function toggleTrack(dk,col,el){
+  if(!user){openUserModal();return;}
+  const d=ll('day_'+dk,{});d[col]=!d[col];ls('day_'+dk,d);
+  el.classList.toggle('checked',!!d[col]);el.textContent=d[col]?'✓':'';
+  renderWeekly();if(dk===todayKey())renderToday();
+}
+
+function renderChart(data){
+  const max=Math.max(...data,1);
+  const ctr=document.getElementById('weekChart'),lbl=document.getElementById('weekChartLbls');
+  ctr.innerHTML='';lbl.innerHTML='';
+  data.forEach((v,i)=>{
+    const h=Math.max(3,Math.round(v/max*70));
+    const col=document.createElement('div');col.className='chart-col';
+    col.innerHTML=`<div class="chart-bar" style="height:${h}px;background:${v>=7?'var(--green)':v>=4?'var(--amber)':'var(--coral-light)'};flex:1;"></div>`;
+    ctr.appendChild(col);
+    const l=document.createElement('div');l.className='chart-col';
+    l.innerHTML=`<div class="chart-lbl">${DAYS_S[i]}</div>`;lbl.appendChild(l);
+  });
+}
+
+function changeWeek(dir){weekOff+=dir;if(weekOff>0)weekOff=0;renderWeekly();}
+
+// WEIGHT / WAIST
+function renderWeightLog(){
+  const log=ll('weight_log',[]),el=document.getElementById('weightLog');
+  if(!log.length){el.innerHTML='<div style="color:var(--text-muted);font-size:0.8rem;padding:8px 0;">Belum ada catatan berat badan</div>';return;}
+  el.innerHTML=[...log].reverse().slice(0,8).map((e,i,arr)=>{
+    const prev=arr[i+1];let diff='';
+    if(prev){const d=e.berat-prev.berat;diff=`<span class="${d<=0?'diff-down':'diff-up'}">${d>0?'+':''}${d.toFixed(1)} kg</span>`;}
+    return `<div class="log-item"><span>${e.date}</span><span style="font-weight:600">${e.berat} kg ${diff}</span></div>`;
+  }).join('');
+}
+function renderWaistLog(){
+  const log=ll('waist_log',[]),el=document.getElementById('waistLog');
+  if(!log.length){el.innerHTML='<div style="color:var(--text-muted);font-size:0.8rem;padding:8px 0;">Belum ada catatan lingkar perut</div>';return;}
+  el.innerHTML=[...log].reverse().slice(0,5).map((e,i,arr)=>{
+    const prev=arr[i+1];let diff='';
+    if(prev){const d=e.lingkar-prev.lingkar;diff=`<span class="${d<=0?'diff-down':'diff-up'}">${d>0?'+':''}${d.toFixed(1)} cm</span>`;}
+    return `<div class="log-item"><span>${e.date}</span><span style="font-weight:600">${e.lingkar} cm ${diff}</span></div>`;
+  }).join('');
+}
+
+// REP LEVELS
+function renderRepLevels(){
+  const lvl=ll('rep_level',0);
+  const milestones=['12 reps (level awal)','15 reps','15 reps + 4 set','15 reps + 5 set'];
+  document.getElementById('repLevels').innerHTML=milestones.map((m,i)=>
+    `<div class="log-item"><span style="color:${i<=lvl?'var(--green-dark)':'var(--text-muted)'}">${i<=lvl?'✅':'○'} Level ${i+1}: ${m}</span></div>`
+  ).join('');
+  const btn=document.getElementById('repBtns');btn.innerHTML='';
+  if(lvl<3){const b=document.createElement('button');b.className='btn btn-green';b.textContent='🆙 Naik Level';b.onclick=()=>{ls('rep_level',Math.min(3,lvl+1));renderRepLevels();};btn.appendChild(b);}
+  if(lvl>0){const b=document.createElement('button');b.className='btn btn-outline';b.textContent='Turunkan Level';b.onclick=()=>{ls('rep_level',Math.max(0,lvl-1));renderRepLevels();};btn.appendChild(b);}
+}
+
+function resetLocal(){
+  if(!user)return;
+  if(!confirm(`Reset cache lokal untuk "${user}"?\nData di Google Sheets tetap aman.`))return;
+  Object.keys(localStorage).filter(k=>k.startsWith('trk_'+user+'_')).forEach(k=>localStorage.removeItem(k));
+  renderAll();alert('Cache lokal berhasil direset.');
+}
+
+function renderAll(){
+  renderToday();renderSchedule();
+  renderExList('exercisesA',EX_A,'a');
+  renderExList('exercisesB',EX_B,'b');
+  renderStepsDisplay();
+}
+
+window.onload=()=>{
+  const url=getUrl();if(url)setSyncStatus('⚙️ URL tersimpan — klik Sync untuk menyimpan data',false);
+  const last=localStorage.getItem('trk_lastUser');
+  if(last){user=last;document.getElementById('userName').textContent=last;}
+  else setTimeout(openUserModal,600);
+  renderAll();
+};
+document.getElementById('userInput').addEventListener('keydown',e=>{if(e.key==='Enter')setUser();});
+</script>
+</body>
+</html>
